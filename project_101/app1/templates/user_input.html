@@ -1,0 +1,88 @@
+<!-- user_input.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Head content remains unchanged -->
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Information</h1>
+    <form id="userForm" method="POST">
+        {% csrf_token %}
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required><br><br>
+
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" required><br><br>
+
+        <button type="button" onclick="submitForm()">Submit</button> <!-- Change type to "button" to prevent form submission -->
+    </form>
+
+    <hr>
+
+    <h2>Display User Information</h2>
+    <table id="userInfoTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+                <th>City</th>
+            </tr>
+        </thead>
+        <tbody id="userInfoBody">
+            <!-- User data will be inserted here -->
+        </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Include jQuery -->
+    <script>
+        function submitForm() {
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+            const city = document.getElementById('city').value;
+
+            // Send AJAX request to save data
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'User_data' %}",  // URL to your Django view for saving data
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    name: name,
+                    age: age,
+                    city: city
+                },
+                success: function(response) {
+                    const newRow = `<tr>
+                                        <td>${name}</td>
+                                        <td>${age}</td>
+                                        <td>${city}</td>
+                                    </tr>`;
+                    
+                    $('#userInfoBody').append(newRow);
+                    $('#userForm').trigger('reset');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
